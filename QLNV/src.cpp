@@ -110,151 +110,158 @@ public:
 	}
 };
 
-void clearScreen() {
-#ifdef _WIN32
-	std::system("cls"); // On Windows
-#else
-	std::system("clear"); // On other platforms
-#endif
-}
-
-void press() {
-	cout << "Press any key to continue...";
-	cin.clear();
-	cin.ignore(numeric_limits<streamsize>::max(), '\n');
-	cin.get();
-	return;
-}
-
-void menu() {
-	cout << "[!]" << " [Danh sach cac thao tac ban co the su dung] " << "\n";
-	cout << "[1]" << " In danh sach nhan vien" << "\n";
-	cout << "[2]" << " Them nhan vien" << "\n";
-	cout << "[3]" << " Sua nhan vien" << "\n";
-	cout << "[4]" << " Xoa nhan vien" << "\n";
-	cout << "[5]" << " Sua muc luong co ban" << "\n";
-}
-
-int select_menu() {
-	int command;
-	cout << "Nhap lua chon cua ban: "; cin >> command;
-	return command;
-}
-
-void print_list_staff(std::vector<Staff*> list_staff) {
-	cout << "+" << std::setfill('-') << std::setw(7) << "+" << std::setw(60) << "+" << "\n";
-	cout << '|' << " STT" << "  |" << std::left << std::setfill(' ') << std::setw(22)
-		<< " Ho va ten" << "|" << std::setw(17) << " Nam lam viec" << '|' << std::setw(18) << " Luong" << '|' << "\n";
-	cout << "+" << std::setfill('-') << std::setw(7) << std::right << "+" << std::setw(60) << std::right << "+" << "\n";
-	for (int i = 0; i < list_staff.size(); i++) {
-		cout << "|" << "  " << std::setfill(' ') << std::left << std::setw(4) << i + 1 << "|" << " " << std::setw(21)
-			<< list_staff[i]->getName() << "|" << " " << std::setw(16) << list_staff[i]->getExp() << "|" << " " << std::setw(17) << list_staff[i]->getSalary() << "|" << "\n";
+class Window_Feature {
+public:
+	void clearScreen() {
+	#ifdef _WIN32
+			std::system("cls"); // On Windows
+	#else
+			std::system("clear"); // On other platforms
+	#endif
 	}
-	cout << "+" << std::setfill('-') << std::setw(7) << std::right << "+" << std::setw(60) << std::right << "+" << "\n";
-}
-
-Staff* print_input_person(Staff* staff) {
-	std::string name = "";
-	int exp_year = 0;
-
-	cin.ignore();
-	cout << "\t[?] Nhap ten: "; std::getline(cin, name);
-	cout << "\t[?] Nhap nam kinh nghiem: "; cin >> exp_year;
-	staff->setName(name);
-	staff->setExp(exp_year);
-	return staff;
-}
-void add_staff_HR(std::vector<Staff*>& list_staff) {
-	Staff* staff = new HR();
-	staff = print_input_person(staff);
-	list_staff.push_back(staff);
-}
-void add_staff_Enginner(std::vector<Staff*>& list_staff) {
-	Staff* staff = new Engineer();
-	staff = print_input_person(staff);
-	list_staff.push_back(staff);
-}
-void add_staff_Business(std::vector<Staff*>& list_staff) {
-	Staff* staff = new Business();
-	staff = print_input_person(staff);
-	dynamic_cast<Business*>(staff)->setContract();
-	list_staff.push_back(staff);
-}
-void add_staff_menu(std::vector<Staff*>& list_staff) {
-	int command;
-	cout << "\t[1] HR" << "\n";
-	cout << "\t[2] Engineer" << "\n";
-	cout << "\t[3] Business" << "\n";
-	cout << "Ban muon them nhan vien o vi tri nao: "; cin >> command;
-	switch (command) {
-	case 1:
-		add_staff_HR(list_staff);
-		break;
-	case 2:
-		add_staff_Enginner(list_staff);
-		break;
-	case 3:
-		add_staff_Business(list_staff);
-		break;
-	}
-}
-
-void change_info_staff(std::vector<Staff*>& list_staff) {
-	int command;
-	std::string name = "";
-	int year = 0;
-	cout << "\t[?] Ban muon sua nhan vien co STT la bao nhieu: "; cin >> command;
-	if (command > list_staff.size()) {
-		cout << "\t[!] Nhan vien ban nhap khong ton tai, vui long them nhan vien" << "\n";
+	void press() {
+		cout << "Press any key to continue...";
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cin.get();
 		return;
 	}
-	else {
-		if (dynamic_cast<Business*>(list_staff[command - 1]) != nullptr) {
-			(static_cast<Business*>(list_staff[command - 1]))->change_info_person();
-		}
-		else list_staff[command - 1]->change_info_person();
-	}
-}
+};
 
-void remove_staff(std::vector<Staff*>& list_staff) {
-	int postition = 0;
-	cout << "\t[!] Nhap STT ban muon xoa: "; cin >> postition;
-	list_staff.erase(list_staff.begin() + postition - 1);
-}
-
-void change_salary(std::vector<Staff*>& list_staff) {
-	int postition = 0;
-	int salary = 0;
-	cout << "\t[!] Nhap STT ban muon sua luong co ban: "; cin >> postition;
-	cout << "\t[?] Nhap so luong co ban moi: "; cin >> salary;
-	list_staff[postition - 1]->setSalary(salary);
-}
-int main() {
+class Staff_Manager : public Window_Feature {
+private:
 	std::vector<Staff*> list_staff;
-	while (true) {
-		clearScreen();
-		menu();
-		int command = select_menu();
+public:
+	void menu() {
+		cout << "[!]" << " [Danh sach cac thao tac ban co the su dung] " << "\n";
+		cout << "[1]" << " In danh sach nhan vien" << "\n";
+		cout << "[2]" << " Them nhan vien" << "\n";
+		cout << "[3]" << " Sua nhan vien" << "\n";
+		cout << "[4]" << " Xoa nhan vien" << "\n";
+		cout << "[5]" << " Sua muc luong co ban" << "\n";
+	}
+	int select_menu() {
+		int command;
+		cout << "Nhap lua chon cua ban: "; cin >> command;
+		return command;
+	}
+
+	void print_list_staff() {
+		cout << "+" << std::setfill('-') << std::setw(7) << "+" << std::setw(60) << "+" << "\n";
+		cout << '|' << " STT" << "  |" << std::left << std::setfill(' ') << std::setw(22)
+			<< " Ho va ten" << "|" << std::setw(17) << " Nam lam viec" << '|' << std::setw(18) << " Luong" << '|' << "\n";
+		cout << "+" << std::setfill('-') << std::setw(7) << std::right << "+" << std::setw(60) << std::right << "+" << "\n";
+		for (int i = 0; i < list_staff.size(); i++) {
+			cout << "|" << "  " << std::setfill(' ') << std::left << std::setw(4) << i + 1 << "|" << " " << std::setw(21)
+				<< list_staff[i]->getName() << "|" << " " << std::setw(16) << list_staff[i]->getExp() << "|" << " " << std::setw(17) << list_staff[i]->getSalary() << "|" << "\n";
+		}
+		cout << "+" << std::setfill('-') << std::setw(7) << std::right << "+" << std::setw(60) << std::right << "+" << "\n";
+	}
+
+	Staff* print_input_person(Staff* staff) {
+		std::string name = "";
+		int exp_year = 0;
+
+		cin.ignore();
+		cout << "\t[?] Nhap ten: "; std::getline(cin, name);
+		cout << "\t[?] Nhap nam kinh nghiem: "; cin >> exp_year;
+		staff->setName(name);
+		staff->setExp(exp_year);
+		return staff;
+	}
+	void add_staff_HR() {
+		Staff* staff = new HR();
+		staff = print_input_person(staff);
+		list_staff.push_back(staff);
+	}
+	void add_staff_Enginner() {
+		Staff* staff = new Engineer();
+		staff = print_input_person(staff);
+		list_staff.push_back(staff);
+	}
+	void add_staff_Business() {
+		Staff* staff = new Business();
+		staff = print_input_person(staff);
+		dynamic_cast<Business*>(staff)->setContract();
+		list_staff.push_back(staff);
+	}
+	void add_staff_menu() {
+		int command;
+		cout << "\t[1] HR" << "\n";
+		cout << "\t[2] Engineer" << "\n";
+		cout << "\t[3] Business" << "\n";
+		cout << "Ban muon them nhan vien o vi tri nao: "; cin >> command;
 		switch (command) {
 		case 1:
-			print_list_staff(list_staff);
-			press();
+			add_staff_HR();
 			break;
 		case 2:
-			add_staff_menu(list_staff);
-			press();
+			add_staff_Enginner();
 			break;
 		case 3:
-			change_info_staff(list_staff);
-			press();
+			add_staff_Business();
+			break;
+		}
+	}
+
+	void change_info_staff() {
+		int command;
+		std::string name = "";
+		int year = 0;
+		cout << "\t[?] Ban muon sua nhan vien co STT la bao nhieu: "; cin >> command;
+		if (command > list_staff.size()) {
+			cout << "\t[!] Nhan vien ban nhap khong ton tai, vui long them nhan vien" << "\n";
+			return;
+		}
+		else {
+			if (dynamic_cast<Business*>(list_staff[command - 1]) != nullptr) {
+				(static_cast<Business*>(list_staff[command - 1]))->change_info_person();
+			}
+			else list_staff[command - 1]->change_info_person();
+		}
+	}
+
+	void remove_staff() {
+		int postition = 0;
+		cout << "\t[!] Nhap STT ban muon xoa: "; cin >> postition;
+		list_staff.erase(list_staff.begin() + postition - 1);
+	}
+
+	void change_salary() {
+		int postition = 0;
+		int salary = 0;
+		cout << "\t[!] Nhap STT ban muon sua luong co ban: "; cin >> postition;
+		cout << "\t[?] Nhap so luong co ban moi: "; cin >> salary;
+		list_staff[postition - 1]->setSalary(salary);
+	}
+};
+
+int main() {
+	Staff_Manager* staff_manager_app = new Staff_Manager();
+	while (true) {
+		staff_manager_app->clearScreen();
+		staff_manager_app->menu();
+		int command = staff_manager_app->select_menu();
+		switch (command) {
+		case 1:
+			staff_manager_app->print_list_staff();
+			staff_manager_app->press();
+			break;
+		case 2:
+			staff_manager_app->add_staff_menu();
+			staff_manager_app->press();
+			break;
+		case 3:
+			staff_manager_app->change_info_staff();
+			staff_manager_app->press();
 			break;
 		case 4:
-			remove_staff(list_staff);
-			press();
+			staff_manager_app->remove_staff();
+			staff_manager_app->press();
 			break;
 		case 5:
-			change_salary(list_staff);
-			press();
+			staff_manager_app->change_salary();
+			staff_manager_app->press();
 			break;
 		default:
 			return 0;
